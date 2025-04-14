@@ -37,7 +37,7 @@ endif
 ifeq ($(USE_RAND),1)
 BT_CXXFLAGS += -DUSE_RAND
 else
-BT_CXXFLAGS += -std=c++11
+BT_CXXFLAGS += -std=c++14
 endif
 
 BT_LDFLAGS =
@@ -50,6 +50,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToFastq \
 		  $(SRC_DIR)/bedToBam \
 		  $(SRC_DIR)/bedpeSetOps \
+		  $(SRC_DIR)/bedpeSummary \
 		  $(SRC_DIR)/bedpeToBam \
 		  $(SRC_DIR)/bedToIgv \
 		  $(SRC_DIR)/bed12ToBed6 \

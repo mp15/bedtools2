@@ -47,6 +47,7 @@ int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
 int bedpeintersect_main(int argc, char* argv[]);//
 int bedpesubtract_main(int argc, char* argv[]);//
+int bedpesummary_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
 void closest_help();
 int cluster_main(int argc, char* argv[]); //
@@ -161,7 +162,8 @@ int main(int argc, char *argv[])
 
     // bedpe specific tools
     else if (subCmd == "bedpeintersect")  return bedpeintersect_main(argc-1, argv+1);
-    else if (subCmd == "bedpesubtract")  return bedpesubtract_main(argc-1, argv+1);
+    else if (subCmd == "bedpesubtract")   return bedpesubtract_main(argc-1, argv+1);
+    else if (subCmd == "bedpesummary")    return bedpesummary_main(argc-1, argv+1);
 
     // BAM-specific tools
     else if (subCmd == "multicov")    return multibamcov_main(argc-1, argv+1);
@@ -303,6 +305,7 @@ int bedtools_help(void)
     cout  << "[ BEDPE tools ]" << endl;
     cout  << "    bedpeintersect "  << "Computes the overlap from two BEDPE files." << endl;
     cout  << "    bedpesubtract  "  << "Computes the difference from two BEDPE files." << endl;
+    cout  << "    bedpesummary   "  << "Statistical summary of intervals in a file." << endl; 
 
 	cout << endl;
 	cout << "[ General Parameters ]" << endl;
