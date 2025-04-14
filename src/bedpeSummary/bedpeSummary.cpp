@@ -149,8 +149,6 @@ static void ProcessBedPE_summary(BedFilePE *bedpe) {
         // Ensure we have a record and not a header line etc.
         if (bedpeStatus_a == BED_VALID) {
             if (bedpeEntry_a.chrom1 == bedpeEntry_a.chrom2) {
-                n_interchrom++;
-            } else {
                 n_intrachrom++;
                 CHRPOS distance = llabs(bedpeEntry_a.start2-bedpeEntry_a.start1);
                 accum.push_back(distance);
@@ -163,6 +161,8 @@ static void ProcessBedPE_summary(BedFilePE *bedpe) {
                 } else if (bedpeEntry_a.strand1 == "-" && bedpeEntry_a.strand2 == "+") {
                     insertion++;
                 }
+            } else {
+                n_interchrom++;
             }
         }
     } while ((bedpeStatus_a = bedpe->GetNextBedPE(bedpeEntry_a, lineNum_a)) != BED_INVALID);
