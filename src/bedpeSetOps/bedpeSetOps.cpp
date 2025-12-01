@@ -165,14 +165,14 @@ static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, cons
                 do {
                     // Ensure we have a record and not a header line etc.
                     if (bedpeStatus_b == BED_VALID) {
+                        // Do the comparison
+                        if (bedpe_equal(bedpeEntry_a, bedpeEntry_b, overlapTolerance)) {
+                            bedpe_a->reportBedPENewLine( bedPEWriteOption == BEDPE_WRITE_B ? bedpeEntry_b : bedpeEntry_a);
+                        }
+
                         // compare to a are past it?
                         if ( bedpe_lessthan(bedpeEntry_a, bedpeEntry_b) ) {
                             break; // if so break out of this loop we need another record from BEDPE a
-                        }
-
-                        // If not past it do the comparison
-                        if (bedpe_equal(bedpeEntry_a, bedpeEntry_b, overlapTolerance)) {
-                            bedpe_a->reportBedPENewLine( bedPEWriteOption == BEDPE_WRITE_B ? bedpeEntry_b : bedpeEntry_a);
                         }
                     }
                 } while ((bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b)) != BED_INVALID);
@@ -287,9 +287,9 @@ static void bedpesubtract_help(void) {
     std::cerr << "Version: " << VERSION << std::endl;
     std::cerr << "Summary: Subtracts records in BEDPE file b from BEDPE file a." << std::endl << std::endl;
 
-    std::cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bedpe> -b <bedpe>" << endl << endl;
+    std::cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bedpe> -b <bedpe>" << std::endl << std::endl;
 
-    std::cerr << "Options: " << endl;
+    std::cerr << "Options: " << std::endl;
 
     // end the program here
     exit(1);
