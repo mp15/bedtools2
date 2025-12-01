@@ -25,10 +25,16 @@
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
+// enumeration for which BEDPE to write
+enum BedPEWrite {
+    BEDPE_WRITE_A = 0,
+    BEDPE_WRITE_B
+};
+
 // function declarations
 static void bedpeintersect_help(void);
 static void bedpesubtract_help(void);
-static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, const CHRPOS overlapTolerance = 0);
+static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, const CHRPOS overlapTolerance = 0, const BedPEWrite bedPEWriteOption = BEDPE_WRITE_A);
 static void ProcessBedPEs_subtract(BedFilePE *bedpe_a, BedFilePE *bedpe_b, const CHRPOS overlapTolerance = 0);
 inline bool bedpe_lessthan(const BEDPE bedpeEntry_a, const BEDPE bedpeEntry_b);
 inline bool bedpe_equal(const BEDPE bedpeEntry_a, const BEDPE bedpeEntry_b, const CHRPOS overlapTolerance);
@@ -37,6 +43,7 @@ inline bool bedpe_equal(const BEDPE bedpeEntry_a, const BEDPE bedpeEntry_b, cons
 inline void dumpBEDPE(BEDPE bedpeEntry);
 inline void dumpleft(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
 #endif
+
 
 int bedpeintersect_main(int argc, char* argv[]) {
     // our configuration variables
@@ -47,6 +54,8 @@ int bedpeintersect_main(int argc, char* argv[]) {
     std::string bedpeFileB;
     // overlap tolerance
     CHRPOS overlapTolerance = 0;
+    // output write option
+    BedPEWrite bedPEWriteOption = BEDPE_WRITE_A;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -82,6 +91,9 @@ int bedpeintersect_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-writeb", 7, parameterLength)) {
+            bedPEWriteOption = BEDPE_WRITE_B;
+        }
         else {
             std::cerr << std::endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << std::endl << std::endl;
             showHelp = true;
@@ -98,7 +110,7 @@ int bedpeintersect_main(int argc, char* argv[]) {
         BedFilePE *bedpe_a= new BedFilePE(bedpeFileA);
         BedFilePE *bedpe_b= new BedFilePE(bedpeFileB);
 
-        ProcessBedPEs_intersect(bedpe_a, bedpe_b, overlapTolerance);
+        ProcessBedPEs_intersect(bedpe_a, bedpe_b, overlapTolerance, bedPEWriteOption);
     }
     else {
         bedpeintersect_help();
@@ -116,14 +128,15 @@ static void bedpeintersect_help(void) {
 
     std::cerr << "Options: " << std::endl;
 
-    std::cerr << "\t-o\t" << "Sets the minimum overlap fraction." << std::endl;
-    std::cerr                    << "\t\t(FLOAT) Default: 1.0" << std::endl << std::endl;
+    std::cerr << "\t-o\t" << "Sets the minimum overlap tolerance." << std::endl;
+    std::cerr                    << "\t\t(INT) Default: 0" << std::endl;
+    std::cerr << "\t-writeb\t" << "Sets the output to write b rather than a." << std::endl << std::endl;
 
     // end the program here
     exit(1);
 }
 
-static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, const CHRPOS overlapTolerance) {
+static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, const CHRPOS overlapTolerance, const BedPEWrite bedPEWriteOption) {
     // process each BEDPE entry and compare to B
     BEDPE bedpeEntry_a;
     int lineNum_a = 0;
@@ -159,7 +172,7 @@ static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b, cons
 
                         // If not past it do the comparison
                         if (bedpe_equal(bedpeEntry_a, bedpeEntry_b, overlapTolerance)) {
-                            bedpe_a->reportBedPENewLine(bedpeEntry_a);
+                            bedpe_a->reportBedPENewLine( bedPEWriteOption == BEDPE_WRITE_B ? bedpeEntry_b : bedpeEntry_a);
                         }
                     }
                 } while ((bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b)) != BED_INVALID);
